@@ -1,0 +1,64 @@
+#+TITLE: Cheatsheet for nixpkgs
+
+* Creating packages
+** ~stdenv.mkDerivation~
+   Every attribute is put into a bash variable and can be accessed from the
+   builder, i.e. also from ~nix-shell~ (e.g. ~$ unpackPhase~ unpacks the source
+   into a directory).
+
+*** Phases
+    To override a phase just set ~<phasename>Phase~ to a string with a bash
+    script.
+
+    Each phase sources ~pre<phasename>~ and ~post<phasename>~ *if the phase is
+    not overwritten*.
+
+**** unpack
+     Unpacks ~src~. For non-[directories|tar|zip] set ~unpackCmd~.
+**** patch
+     Applies the list of ~patches~ with ~patch(1)~.
+**** configure
+     Runs ~./configure~ if it exists. Modify with ~configureFlagsArray~ or
+     change the command with ~configureScript~. ~prefix~ is used.
+**** build
+     Calls ~make~. Modify with ~makeFlagsArray~ and ~buildFlagsArray~.
+     ~dontBuild~ is a convenient shortcut.
+**** check
+     Calls ~make check~ if ~doCheck~ is set. Modify ~make~ invocation with
+     ~checkTarget~ and ~checkFlagsArray~.
+**** install
+     Installs the package under the ~$out~. Calls ~make install~ by default. Modify
+     with ~installTargets~ and ~installFlagsArragy~
+**** fixup
+     Applies various generic fixes to make programs run under nix.
+**** distribution
+     Calls ~make dist~ if `doDist` is set. Modify with ~distTarget~ and
+     ~distFlagsArray~.     
+   
+
+* Overriding
+** fix(points),
+   ~fix~ is a function that calls a function *with its own output* until the
+   output is the same as the input. This only works in a lazy language like nix
+   expressions. It is used to effect in the overriding mechanisms and also the
+   module system.
+
+** ~self~ and ~super~
+   As a convention, the arguments to overriding functions are normally named
+   ~self~ and ~super~, ~super~ being the old packageset you want to override,
+   ~self~ the packagesset *after* the changes you make in the function are
+   applied to the packageset.
+
+** nixpkgs
+*** ~<package>.override = { <arguments> }~
+    Attribute of ~callPackage~ results. Overrides arguments a ~nixpkgs~ package
+    function takes. See ~lib.makeOverridable~.
+*** ~pkgs.overridePackages = (self: super: { <new packages> })~
+    Function in ~nixpkgs~. Returns a new ~nixpkgs~.
+*** ~config.packageOverrides = (self: super: { <new packages> })~
+    Attribute in the ~nixpkgs~ ~config~ argument. Uses ~pkgs.overridePackages~.
+    Can be set in ~config.nix~.
+*** ~<package>.overrideDerivation = (super: { <derivation arguments> })~
+    Overrides the arguments of ~mkDerivation~ after the fact. Breaks the package
+    abstraction and should be avoided if possible!
+    
