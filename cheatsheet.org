@@ -62,3 +62,20 @@
     Overrides the arguments of ~mkDerivation~ after the fact. Breaks the package
     abstraction and should be avoided if possible!
     
+
+* Getting package from a newer/different version
+** Static (fully declarative)
+   You can check out a different hash of the packageset itself:
+   #+begin_src nix
+   HEEEEEEEEEEEEEERE
+   @foo@
+   @static-nixpkgs@
+   @bar@
+   ^^^^^^^^^^^^^^^^^
+   (import fetchFromGitHub {
+     owner = "nixOS";
+     repo = "nixpkgs";
+     rev = "<specific revision>";
+     sha256 = "<its sha>";
+   } { /* nixpkgs arguments (e.g. config) here */ }).somepackage
+   #+end_src
