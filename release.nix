@@ -1,16 +1,17 @@
 with import <nixpkgs> {};
 
 let
-
-  traceValSeq = v: lib.traceVal (builtins.deepSeq v v);
-  seqVal = v: builtins.seq v v;
-  compose = f: g: x: f (g x);
-  test-files = {
-    static-nixpkgs = ./tests/static-nixpkgs.nix;
-  };
-  test-imports = lib.mapAttrs (f: import f) test-files;
-  test-strings = lib.mapAttrs (_: v: builtins.readFile v) test-files;
+  # import nixpkgs in the tests
+  nixpkgsContext = fl: runCommand "nixpkgs-context" {} ''
+    echo 'with import <nixpkgs> {};' >> $out
+    cat ${fl} >> $out
+  '';
+  drv = callPackage ./. {};
+  inherit (drv.passthru) test-files;
+  test-drvs = lib.mapAttrs (_: v: import (nixpkgsContext v)) test-files;
 
 in {
-  rendered = callPackage ./. { inherit test-strings; };
+  rendered = drv;
+  # execute all tests
+  tests = recurseIntoAttrs test-drvs;
 }

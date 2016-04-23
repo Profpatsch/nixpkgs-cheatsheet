@@ -1,14 +1,17 @@
-{ stdenv, lib, substituteAll, pandoc
-, test-strings }:
+{ stdenv, lib, substituteAll, pandoc }:
 
 with lib;
 
 let
+
+  test-files = {
+    static_nixpkgs = ./tests/static_nixpkgs.nix;
+  };
+  test-strings = lib.mapAttrs (_: v: builtins.readFile v) (test-files);
+
   orgfile = substituteAll (
-    ## WHYYYY are you not reading in the file?!
-    { src = ./cheatsheet.org; inherit (test-strings) static-nixpkgs; foo = "foo!"; } // { bar = "bar!"; }
+    { src = ./cheatsheet.org; } // test-strings
   );
-  traceValSeq = v: lib.traceVal (builtins.deepSeq v v);
 
 in
 stdenv.mkDerivation rec {
@@ -17,14 +20,16 @@ stdenv.mkDerivation rec {
 
   phases = [ "buildPhase" "installPhase" ];
 
+  buildInputs = [ pandoc ];
   buildPhase = ''
-    cat ${orgfile}
-    pandoc --standalone --type html5 ./cheatsheet.org > cheatsheet.html
+    pandoc --standalone -t html5 ${orgfile} > cheatsheet.html
   '';
 
   installPhase = ''
     mkdir $out
-    # cp cheatsheet.html $out/index.html
+    cp cheatsheet.html $out/index.html
   '';
+
+  passthru = { inherit test-files; };
 
 }
