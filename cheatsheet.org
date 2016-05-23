@@ -2,10 +2,11 @@
 
 * Setting up a developer environment
   1. checkout nixpkgs
-  2. switch to unstable
-  3. checkout your system’s version with =git checkout $(nixos-version --hash)=
+  2. switch your system to unstable (you don’t want to create extreme merge
+     conflicts or re-invent already existing stuff, do you?)
+  3. checkout your system’s version with =git checkout $(nixos-version --hash)=.
      This way nothing unnecessary needs to be built (master is ahead of the
-     official hydra buildserver)
+     official hydra buildserver).
   4. start hacking
   5. test packages with =nix-build -A <pkgname> <nixpkgs-checkout-directory>=
   6. test changed modules in your system with
