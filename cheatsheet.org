@@ -1,5 +1,11 @@
 #+TITLE: Cheatsheet for nixpkgs
 
+Convention: In verbatim text, =<foobar>= is a standin for a user-variable
+string. This creates a slight ambiguity, since =<something>= is also a valid
+statement in nix expressions, used to reference a global variable. In this
+cheatsheet that language feature only appears as the string =<nixpkgs>= and
+references the standard nixpkgs set, defined by the current active channel.
+
 * Setting up a developer environment
   1. checkout nixpkgs
   2. switch your system to unstable (you don’t want to create extreme merge
