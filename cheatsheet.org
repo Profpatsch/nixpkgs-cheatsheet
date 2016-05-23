@@ -1,5 +1,18 @@
 #+TITLE: Cheatsheet for nixpkgs
 
+* Setting up a developer environment
+  1. checkout nixpkgs
+  2. switch to unstable
+  3. checkout your system’s version with =git checkout $(nixos-version --hash)=
+     This way nothing unnecessary needs to be built (master is ahead of the
+     official hydra buildserver)
+  4. start hacking
+  5. test packages with =nix-build -A <pkgname> <nixpkgs-checkout-directory>=
+  6. test changed modules in your system with
+     =nixos-rebuild switch -I nixpkgs=<nixpkgs-checkout-directory>=. \\
+     Alternatively build a qemu-vm with =nixos-rebuild build-vm -I …=; for further
+     description on building nixos systems with only =nix-build= see (TODO)
+
 * Creating packages
 ** ~stdenv.mkDerivation~
    Every attribute is put into a bash variable and can be accessed from the

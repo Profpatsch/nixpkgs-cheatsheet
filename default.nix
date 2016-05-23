@@ -22,6 +22,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ pandoc ];
   buildPhase = ''
+    # TODO: use emacs
     pandoc --standalone -t html5 ${orgfile} > cheatsheet.html
   '';
 
